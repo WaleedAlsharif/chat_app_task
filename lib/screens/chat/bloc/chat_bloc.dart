@@ -22,6 +22,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           'receiverId': event.receiverId,
           'message': event.message,
           'timestamp': FieldValue.serverTimestamp(),
+       
         });
 
         // Ensure emit is called after asynchronous operation

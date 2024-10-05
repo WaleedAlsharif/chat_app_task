@@ -4,6 +4,7 @@ import 'package:chat_app_task/screens/chat/bloc/chat_event.dart';
 import 'package:chat_app_task/screens/chat/message_list.dart';
 import 'package:chat_app_task/widgets/custom_botton_nav_with_shadow.dart';
 import 'package:chat_app_task/widgets/my_text_field.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -26,6 +27,22 @@ class ChatScreen extends StatefulWidget {
 final TextEditingController _messageController = TextEditingController();
 
 class _ChatScreenState extends State<ChatScreen> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  bool _isTyping = false;
+
+  void _setTypingStatus(bool isTyping) {
+    if (_isTyping != isTyping) {
+      setState(() {
+        _isTyping = isTyping;
+      });
+
+      // Update the 'isTyping' field in Firestore
+      _firestore.collection('users').doc(widget.senderId).update({
+        'isTyping': isTyping,
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -41,7 +58,42 @@ class _ChatScreenState extends State<ChatScreen> {
                 backgroundImage: const AssetImage("assets/icons/profile.png"),
               ),
               30.width,
-              Text(widget.reciverName),
+              Column(
+                children: [
+                  Text(widget.reciverName),
+                  // Typing Indicator and Online/Offline Status
+                  StreamBuilder(
+                    stream: _firestore
+                        .collection('users')
+                        .doc(widget.reciverId)
+                        .snapshots(),
+                    builder:
+                        (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                      if (snapshot.hasData) {
+                        var user = snapshot.data!;
+                        bool isTyping = user['isTyping'] ?? false;
+                        String status = user['status'] ?? 'offline';
+
+                        // Show typing indicator if the user is typing, otherwise show online/offline status
+                        if (isTyping) {
+                          return Text(
+                            "${user['name']} is typing...",
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 10),
+                          );
+                        } else {
+                          return Text(
+                            "${user['name']} is $status",
+                            style: TextStyle(color: Colors.white, fontSize: 10),
+                          );
+                        }
+                      } else {
+                        return const SizedBox.shrink(); // No data yet
+                      }
+                    },
+                  ),
+                ],
+              ),
             ],
           ),
           titleTextStyle:
@@ -76,6 +128,13 @@ class _ChatScreenState extends State<ChatScreen> {
                         controller: _messageController,
                         hint: "write your message ...",
                         textColor: Colors.white,
+                        onChanged: (value) {
+                          if (value.isNotEmpty) {
+                            _setTypingStatus(true);
+                          } else {
+                            _setTypingStatus(false);
+                          }
+                        },
                       ),
                     ),
                     IconButton(
@@ -92,6 +151,8 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                         );
                         _messageController.clear();
+                        _setTypingStatus(
+                            false); // Stop typing after sending the message
                       },
                     ),
                   ],
