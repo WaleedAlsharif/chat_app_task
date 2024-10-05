@@ -8,25 +8,27 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>with WidgetsBindingObserver {
- final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   @override
   void initState() {
-       WidgetsBinding.instance.addObserver(this); // Start observing app lifecycle
+    WidgetsBinding.instance.addObserver(this); // Start observing app lifecycle
 
     super.initState();
   }
 
-    @override
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (_auth.currentUser != null) {
       final String currentUserId = _auth.currentUser!.uid;
-      
+
       if (state == AppLifecycleState.paused) {
         // App is in background - set user status to offline
         _firestore.collection('users').doc(currentUserId).update({
@@ -40,6 +42,7 @@ class _HomeScreenState extends State<HomeScreen>with WidgetsBindingObserver {
       }
     }
   }
+
   @override
   Widget build(BuildContext context) {
     // Get the current logged-in user's uid
@@ -50,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen>with WidgetsBindingObserver {
         title: const Text("User List"),
         actions: [
           GestureDetector(
-            child: Icon(
+            child: const Icon(
               Icons.login,
               color: Colors.white,
             ),
@@ -71,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen>with WidgetsBindingObserver {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           // Filter out the logged-in user from the list
@@ -84,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen>with WidgetsBindingObserver {
             separatorBuilder: (context, index) => SizedBox(
               height: 10.h,
             ),
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             itemCount: users.length,
             itemBuilder: (context, index) {
               var user = users[index];
