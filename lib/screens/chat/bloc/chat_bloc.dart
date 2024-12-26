@@ -11,19 +11,19 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       try {
         // Create a unique chat ID between the sender and receiver
         String chatId = generateChatId(event.senderId, event.receiverId);
-
         // Send message to Firestore asynchronously
         await _firestore
             .collection('chats')
             .doc(chatId)
             .collection('messages')
-            .add({
-          'senderId': event.senderId,
-          'receiverId': event.receiverId,
-          'message': event.message,
-          'timestamp': FieldValue.serverTimestamp(),
-       
-        });
+            .add(
+          {
+            'senderId': event.senderId,
+            'receiverId': event.receiverId,
+            'message': event.message,
+            'timestamp': FieldValue.serverTimestamp(),
+          },
+        );
 
         // Ensure emit is called after asynchronous operation
         emit(MessageSent());

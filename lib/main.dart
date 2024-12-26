@@ -26,28 +26,29 @@ class MyApp extends StatelessWidget {
       builder: (context, child) => MultiBlocProvider(
         providers: [
           BlocProvider(create: (_) => AuthBloc()),
-         BlocProvider(create: (_) => ChatBloc()),
+          BlocProvider(create: (_) => ChatBloc()),
         ],
         child: MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'Flutter Demo',
-            theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
-              appBarTheme: const AppBarTheme(
-                  backgroundColor: Colors.black,
-                  titleTextStyle: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                  )),
-              useMaterial3: true,
+          debugShowCheckedModeBanner: false,
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Colors.black,
+              titleTextStyle: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+              ),
             ),
-            routes: <String, WidgetBuilder>{
-              '/loginScreen': (BuildContext context) => const LoginScreen(),
-              '/registerScreen': (BuildContext context) =>
-                  const RegisterScreen(),
-              '/homeScreen': (BuildContext context) => HomeScreen(),
-            },
-            home: const LoginScreen()),
+            useMaterial3: true,
+          ),
+          routes: <String, WidgetBuilder>{
+            '/loginScreen': (BuildContext context) => const LoginScreen(),
+            '/registerScreen': (BuildContext context) => const RegisterScreen(),
+            '/homeScreen': (BuildContext context) => const HomeScreen(),
+          },
+          home: const LoginScreen(),
+        ),
       ),
     );
   }

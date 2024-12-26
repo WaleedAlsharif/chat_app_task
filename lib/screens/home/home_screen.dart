@@ -76,12 +76,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-
           // Filter out the logged-in user from the list
           final users = snapshot.data!.docs
               .where((user) => user['uid'] != currentUserId)
               .toList();
-
           // Display the filtered users in a ListView
           return ListView.separated(
             separatorBuilder: (context, index) => SizedBox(

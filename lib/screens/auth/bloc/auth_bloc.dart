@@ -11,30 +11,33 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with WidgetsBindingObserver {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   AuthBloc() : super(AuthInitial()) {
     // Handle LoginEvent
-    on<LoginEvent>((event, emit) async {
-      emit(AuthLoading());
-      try {
-        UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-          email: event.email,
-          password: event.password,
-        );
-        _firestore.collection("users").doc(userCredential.user!.uid).set(
-          {
-            'uid': userCredential.user!.uid,
-            'email': event.email,
-            "status": 'online',
-            "lastSeen": FieldValue.serverTimestamp(),
-            "isTyping": false
-          },
-          SetOptions(merge: true),
-        );
-        emit(
-          Authenticated(),
-        );
-      } catch (e) {
-        emit(AuthError(e.toString()));
-      }
-    });
+    on<LoginEvent>(
+      (event, emit) async {
+        emit(AuthLoading());
+        try {
+          UserCredential userCredential =
+              await _auth.signInWithEmailAndPassword(
+            email: event.email,
+            password: event.password,
+          );
+          _firestore.collection("users").doc(userCredential.user!.uid).set(
+            {
+              'uid': userCredential.user!.uid,
+              'email': event.email,
+              "status": 'online',
+              "lastSeen": FieldValue.serverTimestamp(),
+              "isTyping": false
+            },
+            SetOptions(merge: true),
+          );
+          emit(
+            Authenticated(),
+          );
+        } catch (e) {
+          emit(AuthError(e.toString()));
+        }
+      },
+    );
 
     // Handle RegisterEvent
     on<RegisterEvent>((event, emit) async {
@@ -87,13 +90,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with WidgetsBindingObserver {
 
     void setUserStatus(bool isOnline) async {
       if (_auth.currentUser != null) {
-        await _firestore
-            .collection('users')
-            .doc(_auth.currentUser!.uid)
-            .update({
-          'status': isOnline, // online/offline
-          'lastSeen': FieldValue.serverTimestamp(),
-        });
+        await _firestore.collection('users').doc(_auth.currentUser!.uid).update(
+          {
+            'status': isOnline, // online/offline
+            'lastSeen': FieldValue.serverTimestamp(),
+          },
+        );
       }
     }
 
